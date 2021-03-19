@@ -1,0 +1,29 @@
+{
+    "rickshaw-benchmark": {
+        "schema": {
+            "version": "2020.05.18"
+        }
+    },
+    "benchmark": "cyclictest",
+    "controller": {
+        "post-script": "%bench-dir%cyclictest-post-process"
+    },
+    "client": {
+        "files-from-controller": [
+            {
+                "src": "%bench-dir%/cyclictest-base",
+                "dest": "/usr/bin/"
+            },
+            {
+                "src": "%bench-dir%/cyclictest-runtime",
+                "dest": "/usr/bin/"
+            },
+            {
+                "src": "%bench-dir%/cyclictest-client",
+                "dest": "/usr/bin/"
+            }
+        ],
+        "runtime": "cyclictest-runtime",
+        "start": "cyclictest-client"
+    }
+}
