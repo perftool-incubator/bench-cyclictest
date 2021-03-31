@@ -2,7 +2,7 @@
 exec >cyclictest-client-stderrout.txt
 exec 2>&1
 
-. /usr/bin/cyclictest-base || (echo "/usr/bin/clicytest-base not found"; exit 1)
+. /usr/bin/cyclictest-base || (echo "/usr/bin/cyclictest-base not found"; exit 1)
 
 dump_runtime
 validate_label
@@ -23,10 +23,10 @@ fi
 duration=60
 policy=fifo
 interval=100
-cpus=$WORKLOAD_CPUS
+smt="on"
 
-longopts="duration:,priority:,policy:,interval:"
-opts=$(getopt -q -o "D:p:i:" --longoptions "$longopts" -n "getopt.sh" -- "$@");
+longopts="duration:,priority:,policy:,interval:,smt:"
+opts=$(getopt -q -o "D:p:i:s:" --longoptions "$longopts" -n "getopt.sh" -- "$@");
 eval set -- "$opts";
 while true; do
     case "$1" in
@@ -50,6 +50,11 @@ while true; do
             interval=$1
             shift
             ;;
+        -s|--smt)
+            shift
+            smt=$1
+            shift
+            ;;
         --)
             shift;
             break
@@ -60,7 +65,31 @@ while true; do
     esac
 done
 
-cmd="taskset -c $WORKLOAD_CPUS,$HK_CPUS /usr/bin/cyclictest --policy $policy -i $interval -H 1000 --histfile histogram.txt -D $duration -q -a $cpus -t"
+# adjust CPUs to use
+cpu_str=""
+for cpu in $(echo $WORKLOAD_CPUS | sed -e "s/,/ /g"); do
+    cpu_str+=" --cpu $cpu"
+done
+cmd="${TOOLBOX_HOME}/bin/get-cpus-ordered.py --smt ${smt} ${cpu_str}"
+echo "about to run: ${cmd}"
+CMD_OUTPUT=$(${cmd})
+echo -e "${CMD_OUTPUT}"
+WORKLOAD_CPUS=$(echo -e "${CMD_OUTPUT}" | grep "final cpus:" | awk '{ print $3 }')
+echo "WORLOAD_CPUS: ${WORKLOAD_CPUS}"
+
+cpu_str=""
+for cpu in $(echo $HK_CPUS | sed -e "s/,/ /g"); do
+    cpu_str+=" --cpu $cpu"
+done
+cmd="${TOOLBOX_HOME}/bin/get-cpus-ordered.py --smt ${smt} ${cpu_str}"
+echo "about to run: ${cmd}"
+CMD_OUTPUT=$(${cmd})
+echo -e "${CMD_OUTPUT}"
+HK_CPUS=$(echo -e "${CMD_OUTPUT}" | grep "final cpus:" | awk '{ print $3 }')
+echo "HK_CPUS: ${HK_CPUS}"
+
+
+cmd="taskset -c $WORKLOAD_CPUS,$HK_CPUS /usr/bin/cyclictest --policy $policy -i $interval -H 1000 --histfile histogram.txt -D $duration -q -a ${WORKLOAD_CPUS} -t"
 echo "About to run: $cmd"
 date +%s.%N >begin.txt
 $cmd >cyclictest-bin-stderrout.txt 2>&1
