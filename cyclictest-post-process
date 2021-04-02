@@ -12,7 +12,8 @@ my $ignore;
 
 GetOptions ("duration=s" => \$ignore,
             "policy=s" => \$ignore,
-            "interval=i" => \$ignore
+            "interval=i" => \$ignore,
+            "smt=s" => \$ignore,
             );
 
 my @metrics;
