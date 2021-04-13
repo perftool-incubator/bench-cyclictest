@@ -16,10 +16,10 @@ GetOptions ("duration=s" => \$ignore,
             "smt=s" => \$ignore,
             );
 
-my @metrics;
 my %metric_types;
 my $primary_metric = 'wakeup-latency-usec';
 my %times;
+my $metric_data_name;
 
 foreach my $i (qw(begin end)) {
     my $file = $i . ".txt";
@@ -38,23 +38,19 @@ if ( -e $result_file) {
         if ( /^# Max Latencies:\s+(.*)$/ ) {
             my @latencies = split(/\s+/, $1);
             my $system_max_latency = pop(@latencies);
-            my %this_metric;
-            my %desc = ('source' => 'cyclictest',
-                        'type' => $primary_metric,
-                        'class' => 'count');
-            my %s = ('end' => $times{'end'},
-                     'begin' => $times{'begin'},
-                     'value' =>  int $system_max_latency);
-            $this_metric{'desc'} = \%desc;
-            push(@{ $this_metric{'data'} }, \%s);
-            push(@metrics, \%this_metric);
+            my %desc = ('source' => 'cyclictest', 'type' => $primary_metric, 'class' => 'count');
+            my %names = ();
+            my %sample = ('begin' => $times{'begin'}, 'end' => $times{'end'}, 'value' => int $system_max_latency);
+            log_sample("0", \%desc, \%names, \%sample);
         }
     }
+    $metric_data_name = finish_samples();
     close(FH);
 }
 # Associate the metrics with a benchmark-period (in this case "measurement")
 my %sample;
 my @periods;
+my @metrics = ( $metric_data_name );
 my %period = ('name' => 'measurement');
 $sample{'rickshaw-bench-metric'}{'schema'}{'version'} = "2021.03.02";
 $period{'metrics'} = \@metrics;
