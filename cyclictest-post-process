@@ -8,6 +8,18 @@ use JSON::XS;
 use Data::Dumper;
 use Getopt::Long;
 
+BEGIN {
+    if (!(exists $ENV{'TOOLBOX_HOME'} && -d "$ENV{'TOOLBOX_HOME'}/perl")) {
+	print "This script requires libraries that are provided by the toolbox project.\n";
+	print "Toolbox can be acquired from https://github.com/perftool-incubator/toolbox and\n";
+	print "then use 'export TOOLBOX_HOME=/path/to/toolbox' so that it can be located.\n";
+	exit 1;
+    }
+}
+use lib "$ENV{'TOOLBOX_HOME'}/perl";
+use toolbox::json;
+use toolbox::metrics;
+
 my $ignore;
 
 GetOptions ("duration=s" => \$ignore,
@@ -52,8 +64,8 @@ my %sample;
 my @periods;
 my @metrics = ( $metric_data_name );
 my %period = ('name' => 'measurement');
-$sample{'rickshaw-bench-metric'}{'schema'}{'version'} = "2021.03.02";
-$period{'metrics'} = \@metrics;
+$sample{'rickshaw-bench-metric'}{'schema'}{'version'} = "2021.04.12";
+$period{'metric-files'} = \@metrics;
 push(@periods, \%period);
 $sample{'periods'} = \@periods;
 $sample{'primary-period'} = 'measurement';
