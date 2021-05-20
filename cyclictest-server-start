@@ -5,30 +5,46 @@ exec 2>&1
 
 . /usr/bin/cyclictest-base || (echo "/usr/bin/cyclictest-base not found"; exit 1)
 
-if [ -z "$WORKLOAD_CPUS" ]; then
-    exit_error "WORKLOAD_CPUS is not defined.  This must be defined to run cyclictest"
+if [ -z "$WORKLOAD_CPUS" -a -z "$HK_CPUS" ]; then
+    TMP_CPUS=$(grep Cpus_allowed_list /proc/self/status | awk '{ print $2 }')
+    echo "CPUs Allowed List: ${TMP_CPUS}"
+    CPUS=""
+    for sequence in $(echo ${TMP_CPUS} | sed -e 's/,/ /g'); do
+	if echo $sequence | grep -q '-'; then
+	    start=$(echo $sequence | awk -F- '{ print $1 }')
+	    stop=$(echo $sequence | awk -F- '{ print $2 }')
+	    CPUS+=" $(seq $start 1 $stop) "
+	else
+	    CPUS+=" $sequence "
+	fi
+    done
+    CPUS=$(echo "${CPUS}" | sed -z 's/\n/ /g' | sed -e 's/\s\+/,/g' -e 's/^,//' -e 's/,$//')
 else
+    echo "HK_CPUS: $HK_CPUS"
     echo "WORKLOAD_CPUS: $WORKLOAD_CPUS"
 
     echo "Current script affinity:"
     taskset -c -p $$
+
+    CPUS="${HK_CPUS},${WORKLOAD_CPUS}"
 fi
 
-NUM_WORKLOAD_CPUS=$(echo "${WORKLOAD_CPUS}" | sed -e "s/,/ /g" | wc -w)
+echo "CPUS: ${CPUS}"
 
-echo "NUM_WORKLOAD_CPUS=${NUM_WORKLOAD_CPUS}"
+NUM_CPUS=$(echo "${CPUS}" | sed -e "s/,/ /g" | wc -w)
+echo "NUM_CPUS=${NUM_CPUS}"
 
-taskset -c ${WORKLOAD_CPUS} \
+taskset -c ${CPUS} \
 	stress-ng \
-	--cpu ${NUM_WORKLOAD_CPUS} \
-	--hdd ${NUM_WORKLOAD_CPUS} \
-	--io ${NUM_WORKLOAD_CPUS} \
-	--malloc ${NUM_WORKLOAD_CPUS} \
-	--mmap ${NUM_WORKLOAD_CPUS} \
-	--msg ${NUM_WORKLOAD_CPUS} \
-	--stream ${NUM_WORKLOAD_CPUS} \
-	--sysinfo ${NUM_WORKLOAD_CPUS} \
-	--vm ${NUM_WORKLOAD_CPUS} \
+	--cpu ${NUM_CPUS} \
+	--hdd ${NUM_CPUS} \
+	--io ${NUM_CPUS} \
+	--malloc ${NUM_CPUS} \
+	--mmap ${NUM_CPUS} \
+	--msg ${NUM_CPUS} \
+	--stream ${NUM_CPUS} \
+	--sysinfo ${NUM_CPUS} \
+	--vm ${NUM_CPUS} \
 	--timeout 0 --metrics --times --verbose > stress-ng.out 2>&1 &
 pid=$!
 echo "stress-ng PID is ${pid}"
