@@ -1,0 +1,35 @@
+#!/bin/bash
+
+exec >cyclictest-server-start.txt
+exec 2>&1
+
+. /usr/bin/cyclictest-base || (echo "/usr/bin/cyclictest-base not found"; exit 1)
+
+if [ -z "$WORKLOAD_CPUS" ]; then
+    exit_error "WORKLOAD_CPUS is not defined.  This must be defined to run cyclictest"
+else
+    echo "WORKLOAD_CPUS: $WORKLOAD_CPUS"
+
+    echo "Current script affinity:"
+    taskset -c -p $$
+fi
+
+NUM_WORKLOAD_CPUS=$(echo "${WORKLOAD_CPUS}" | sed -e "s/,/ /g" | wc -w)
+
+echo "NUM_WORKLOAD_CPUS=${NUM_WORKLOAD_CPUS}"
+
+taskset -c ${WORKLOAD_CPUS} \
+	stress-ng \
+	--cpu ${NUM_WORKLOAD_CPUS} \
+	--hdd ${NUM_WORKLOAD_CPUS} \
+	--io ${NUM_WORKLOAD_CPUS} \
+	--malloc ${NUM_WORKLOAD_CPUS} \
+	--mmap ${NUM_WORKLOAD_CPUS} \
+	--msg ${NUM_WORKLOAD_CPUS} \
+	--stream ${NUM_WORKLOAD_CPUS} \
+	--sysinfo ${NUM_WORKLOAD_CPUS} \
+	--vm ${NUM_WORKLOAD_CPUS} \
+	--timeout 0 --metrics --times --verbose > stress-ng.out 2>&1 &
+pid=$!
+echo "stress-ng PID is ${pid}"
+echo ${pid} > stress-ng.pid

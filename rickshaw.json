@@ -25,5 +25,24 @@
         ],
         "runtime": "cyclictest-runtime",
         "start": "cyclictest-client"
+    },
+    "server": {
+        "required": false,
+        "files-from-controller": [
+            {
+                "src": "%bench-dir%/cyclictest-base",
+                "dest": "/usr/bin/"
+            },
+            {
+                "src": "%bench-dir%/cyclictest-server-start",
+                "dest": "/usr/bin/"
+            },
+            {
+                "src": "%bench-dir%/cyclictest-server-stop",
+                "dest": "/usr/bin/"
+            }
+        ],
+        "start": "cyclictest-server-start",
+        "stop": "cyclictest-server-stop"
     }
 }
