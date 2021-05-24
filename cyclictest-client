@@ -13,7 +13,7 @@ if [ -z "$WORKLOAD_CPUS" ]; then
 else
     echo "WORKLOAD_CPUS: $WORKLOAD_CPUS"
 fi
-if [ -z "HK_CPUS" ]; then
+if [ -z "$HK_CPUS" ]; then
     exit_error "HK_CPUS is not defined.  This must be defined to run cyclictest"
 else
     echo "HK_CPUS: $HK_CPUS"
