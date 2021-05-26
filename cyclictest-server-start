@@ -10,13 +10,13 @@ if [ -z "$WORKLOAD_CPUS" -a -z "$HK_CPUS" ]; then
     echo "CPUs Allowed List: ${TMP_CPUS}"
     CPUS=""
     for sequence in $(echo ${TMP_CPUS} | sed -e 's/,/ /g'); do
-	if echo $sequence | grep -q '-'; then
-	    start=$(echo $sequence | awk -F- '{ print $1 }')
-	    stop=$(echo $sequence | awk -F- '{ print $2 }')
-	    CPUS+=" $(seq $start 1 $stop) "
-	else
-	    CPUS+=" $sequence "
-	fi
+        if echo $sequence | grep -q '-'; then
+            start=$(echo $sequence | awk -F- '{ print $1 }')
+            stop=$(echo $sequence | awk -F- '{ print $2 }')
+            CPUS+=" $(seq $start 1 $stop) "
+        else
+            CPUS+=" $sequence "
+        fi
     done
     CPUS=$(echo "${CPUS}" | sed -z 's/\n/ /g' | sed -e 's/\s\+/,/g' -e 's/^,//' -e 's/,$//')
 else
@@ -34,18 +34,28 @@ echo "CPUS: ${CPUS}"
 NUM_CPUS=$(echo "${CPUS}" | sed -e "s/,/ /g" | wc -w)
 echo "NUM_CPUS=${NUM_CPUS}"
 
+NUM_TESTS=9
+TEST_COPIES=1
+if [ ${NUM_CPUS} -gt ${NUM_TESTS} ]; then
+    while [ $(( NUM_TESTS*TEST_COPIES )) -lt ${NUM_CPUS} ]; do
+        (( TEST_COPIES += 1 ))
+    done
+fi
+
+echo "TEST_COPIES: ${TEST_COPIES}"
+
 taskset -c ${CPUS} \
-	stress-ng \
-	--cpu ${NUM_CPUS} \
-	--hdd ${NUM_CPUS} \
-	--io ${NUM_CPUS} \
-	--malloc ${NUM_CPUS} \
-	--mmap ${NUM_CPUS} \
-	--msg ${NUM_CPUS} \
-	--stream ${NUM_CPUS} \
-	--sysinfo ${NUM_CPUS} \
-	--vm ${NUM_CPUS} \
-	--timeout 0 --metrics --times --verbose > stress-ng.out 2>&1 &
+        stress-ng \
+        --cpu ${TEST_COPIES} \
+        --hdd ${TEST_COPIES} \
+        --io ${TEST_COPIES} \
+        --malloc ${TEST_COPIES} \
+        --mmap ${TEST_COPIES} \
+        --msg ${TEST_COPIES} \
+        --stream ${TEST_COPIES} \
+        --sysinfo ${TEST_COPIES} \
+        --vm ${TEST_COPIES} \
+        --timeout 0 --metrics --times --verbose > stress-ng.out 2>&1 &
 pid=$!
 echo "stress-ng PID is ${pid}"
 echo ${pid} > stress-ng.pid
