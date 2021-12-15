@@ -93,7 +93,7 @@ if [ -n "${priority}" ]; then
     prio="--priority ${priority}"
 fi
 
-cmd="taskset -c ${WORKLOAD_CPUS},${HK_CPUS} /usr/bin/cyclictest --policy $policy ${prio} -i ${interval} -H 1000 --histfile histogram.txt -D ${duration} -q -a ${WORKLOAD_CPUS} -t"
+cmd="taskset -c ${WORKLOAD_CPUS},${HK_CPUS} /usr/bin/cyclictest --policy $policy ${prio} --interval ${interval} --histofall 100 --histfile histogram.txt --duration ${duration} --quiet --affinity ${WORKLOAD_CPUS} --threads --mlockall --json cyclictest.json --mainaffinity ${HK_CPUS}"
 echo "About to run: $cmd"
 date +%s.%N >begin.txt
 $cmd >cyclictest-bin-stderrout.txt 2>&1
