@@ -24,9 +24,11 @@ duration=60
 policy=fifo
 interval=100
 smt="on"
+break_on=0
 
-longopts="duration:,priority:,policy:,interval:,smt:"
-opts=$(getopt -q -o "D:p:i:s:" --longoptions "$longopts" -n "getopt.sh" -- "$@");
+
+longopts="duration:,priority:,policy:,interval:,smt:,break-on:"
+opts=$(getopt -q -o "D:p:i:s:b:" --longoptions "$longopts" -n "getopt.sh" -- "$@");
 eval set -- "$opts";
 while true; do
     case "$1" in
@@ -55,6 +57,11 @@ while true; do
             smt=$1
             shift
             ;;
+	-b|--break-on)
+	    shift
+	    break_on=$1
+	    shift
+	    ;;
         --)
             shift;
             break
@@ -97,7 +104,12 @@ if [ -n "${priority}" ]; then
     prio="--priority ${priority}"
 fi
 
-cmd="taskset -c ${WORKLOAD_CPUS},${HK_CPUS} /usr/bin/cyclictest --policy $policy ${prio} --interval ${interval} --histofall 100 --histfile histogram.txt --duration ${duration} --quiet --affinity ${WORKLOAD_CPUS} --threads ${WORKLOAD_CPUS_COUNT} --mlockall --json cyclictest.json --mainaffinity ${HK_CPUS}"
+break=""
+if [ ${break_on} -gt 0 ]; then
+    break="--breaktrace=${break_on}"
+fi
+
+cmd="taskset -c ${WORKLOAD_CPUS},${HK_CPUS} /usr/bin/cyclictest --policy $policy ${prio} --interval ${interval} --histofall 100 --histfile histogram.txt --duration ${duration} --quiet --affinity ${WORKLOAD_CPUS} --threads ${WORKLOAD_CPUS_COUNT} --mlockall --json cyclictest.json --mainaffinity ${HK_CPUS} --smi ${break}"
 echo "About to run: $cmd"
 date +%s.%N >begin.txt
 $cmd >cyclictest-bin-stderrout.txt 2>&1
