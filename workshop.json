@@ -55,11 +55,11 @@
       "name": "stress-ng_src",
       "type": "source",
       "source_info": {
-        "url": "https://github.com/ColinIanKing/stress-ng/archive/refs/tags/V0.12.08.tar.gz",
-        "filename": "stress-ng-0.12.08.tar.gz",
+        "url": "https://github.com/ColinIanKing/stress-ng/archive/refs/tags/V0.14.06.tar.gz",
+        "filename": "stress-ng.tar.gz",
         "commands": {
-          "unpack": "tar -xzf stress-ng-0.12.08.tar.gz",
-          "get_dir": "tar -tzf stress-ng-0.12.08.tar.gz  | head -n 1",
+          "unpack": "tar -xzf stress-ng.tar.gz",
+          "get_dir": "tar -tzf stress-ng.tar.gz  | head -n 1",
           "commands": [
             "make",
             "make install",
