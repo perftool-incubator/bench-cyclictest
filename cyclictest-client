@@ -25,13 +25,18 @@ policy=fifo
 interval=100
 smt="on"
 break_on=0
+smt="on"
 
-
-longopts="duration:,priority:,policy:,interval:,smt:,break-on:"
+longopts="duration:,priority:,policy:,interval:,smt:,break-on:,smi:"
 opts=$(getopt -q -o "D:p:i:s:b:" --longoptions "$longopts" -n "getopt.sh" -- "$@");
 eval set -- "$opts";
 while true; do
     case "$1" in
+	--smi)
+	    shift
+	    smi=$1
+	    shift
+	    ;;
         -D|--duration)
             shift
             duration=$1
@@ -111,7 +116,19 @@ fi
 
 validate_clocksource
 
-cmd="taskset -c ${WORKLOAD_CPUS},${HK_CPUS} /usr/bin/cyclictest --policy $policy ${prio} --interval ${interval} --histofall 100 --histfile histogram.txt --duration ${duration} --quiet --affinity ${WORKLOAD_CPUS} --threads ${WORKLOAD_CPUS_COUNT} --mlockall --json cyclictest.json --mainaffinity ${HK_CPUS} --smi ${break}"
+case "${smi}" in
+    on)
+	smi_arg="--smi"
+	;;
+    off)
+	smi_arg=""
+	;;
+    *)
+	exit_error "invalid --smi value [${smi}]"
+	;;
+esac
+
+cmd="taskset -c ${WORKLOAD_CPUS},${HK_CPUS} /usr/bin/cyclictest --policy $policy ${prio} --interval ${interval} --histofall 100 --histfile histogram.txt --duration ${duration} --quiet --affinity ${WORKLOAD_CPUS} --threads ${WORKLOAD_CPUS_COUNT} --mlockall --json cyclictest.json --mainaffinity ${HK_CPUS} ${smi_arg} ${break}"
 echo "About to run: $cmd"
 date +%s.%N >begin.txt
 $cmd >cyclictest-bin-stderrout.txt 2>&1

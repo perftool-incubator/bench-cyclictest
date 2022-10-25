@@ -6,7 +6,7 @@ exec 2>&1
 if [ -e stress-ng.pid ]; then
     pid=$(cat stress-ng.pid)
     echo "Going to kill pid ${pid}"
-    /usr/bin/kill --verbose --signal 2 ${pid}
+    kill -2 ${pid}
     for i in $(seq 1 10); do
 	sleep 3
 	echo "."
@@ -16,20 +16,24 @@ if [ -e stress-ng.pid ]; then
     done
     if [ -e /proc/${pid} ]; then
 	echo "PID ${pid} still exists, trying kill -9"
-	/usr/bin/kill --verbose --signal 9 ${pid}
-    fi
-    if [ -e /proc/${pid} ]; then
-	for i in $(seq 1 10); do
-	    sleep 3
-	    echo "."
-	    if [ ! -e /proc/${pid} ]; then
-		echo "PID is gone"
-		break
+	kill -9 ${pid}
+
+	if [ -e /proc/${pid} ]; then
+	    for i in $(seq 1 10); do
+		sleep 3
+		echo "."
+		if [ ! -e /proc/${pid} ]; then
+		    echo "PID is gone"
+		    break
+		fi
+	    done
+	    if [ -e /proc/${pid} ]; then
+		echo "ERROR: PID ${pid} has not been terminated"
+		exit 1
 	    fi
-	done
-    else
-	echo "PID is gone"
+	fi
     fi
+    echo "PID is gone"
 else
     echo "stress-ng PID file not found"
     echo "PWD: $(pwd)"
