@@ -25,7 +25,7 @@ policy=fifo
 interval=100
 smt="on"
 break_on=0
-smt="on"
+smi="on"
 
 longopts="duration:,priority:,policy:,interval:,smt:,break-on:,smi:"
 opts=$(getopt -q -o "D:p:i:s:b:" --longoptions "$longopts" -n "getopt.sh" -- "$@");
