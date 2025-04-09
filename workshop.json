@@ -8,13 +8,34 @@
     {
       "name": "default",
       "requirements": [
+        "deps",
         "numactl_src",
         "rttests_src",
+        "stress-ng_src"
+      ]
+    },
+    {
+      "name": "stream9",
+      "requirements": [
+        "deps",
+        "numactl_src",
+        "rttests_patches",
+        "rttests_src_glibc",
         "stress-ng_src"
       ]
     }
   ],
   "requirements": [
+    {
+      "name": "deps",
+      "type": "distro",
+      "distro_info": {
+          "packages": [
+              "libtool",
+              "patch"
+          ]
+      }
+    },
     {
       "name": "numactl_src",
       "type": "source",
@@ -34,22 +55,43 @@
       }
     },
     {
-      "name": "rttests_src",
-      "type": "source",
-      "source_info": {
-        "url": "https://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git/snapshot/rt-tests-2.1.tar.gz",
-        "filename": "rt-tests-2.1.tar.gz",
-        "commands": {
-          "unpack": "tar -xzf rt-tests-2.1.tar.gz",
-          "get_dir": "tar -tzf rt-tests-2.1.tar.gz | head -n 1",
-          "commands": [
-            "make",
-            "make install",
-            "/bin/cp cyclictest /usr/bin",
-            "ldconfig"
-          ]
+        "name": "rttests_patches",
+        "type": "files",
+        "files_info": {
+            "files": [
+                {
+                    "src": "%bench-dir%/rt-tests-glibc-headers.patch",
+                    "dst": "/root"
+                }
+            ]
         }
-      }
+    },
+    {
+        "name": "rttests_src",
+        "type": "manual",
+        "manual_info": {
+            "commands": [
+                "git clone git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git /root/rt-tests",
+                "cd /root/rt-tests; git checkout v2.7",
+                "cd /root/rt-tests; make",
+                "cd /root/rt-tests; make install",
+                "ldconfig"
+            ]
+        }
+    },
+    {
+        "name": "rttests_src_glibc",
+        "type": "manual",
+        "manual_info": {
+            "commands": [
+                "git clone git://git.kernel.org/pub/scm/utils/rt-tests/rt-tests.git /root/rt-tests",
+                "cd /root/rt-tests; git checkout v2.7",
+                "cd /root/rt-tests; patch -p1 < /root/rt-tests-glibc-headers.patch",
+                "cd /root/rt-tests; make",
+                "cd /root/rt-tests; make install",
+                "ldconfig"
+            ]
+        }
     },
     {
       "name": "stress-ng_src",
