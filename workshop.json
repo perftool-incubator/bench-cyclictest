@@ -75,6 +75,7 @@
                 "cd /root/rt-tests; git checkout v2.7",
                 "cd /root/rt-tests; make",
                 "cd /root/rt-tests; make install",
+                "cd /root/rt-tests; /bin/cp cyclictest /usr/bin",
                 "ldconfig"
             ]
         }
@@ -89,6 +90,7 @@
                 "cd /root/rt-tests; patch -p1 < /root/rt-tests-sched-headers.patch",
                 "cd /root/rt-tests; make",
                 "cd /root/rt-tests; make install",
+                "cd /root/rt-tests; /bin/cp cyclictest /usr/bin",
                 "ldconfig"
             ]
         }
