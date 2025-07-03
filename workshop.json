@@ -23,6 +23,16 @@
         "rttests_src_sched",
         "stress-ng_src"
       ]
+    },
+    {
+      "name": "rhubi9",
+      "requirements": [
+        "deps",
+        "numactl_src",
+        "rttests_patches",
+        "rttests_src_sched",
+        "stress-ng_src"
+      ]
     }
   ],
   "requirements": [
