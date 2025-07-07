@@ -15,6 +15,16 @@
       ]
     },
     {
+      "name": "alma9",
+      "requirements": [
+        "deps",
+        "numactl_src",
+        "rttests_patches",
+        "rttests_src_sched",
+        "stress-ng_src"
+      ]
+    },
+    {
       "name": "stream9",
       "requirements": [
         "deps",
