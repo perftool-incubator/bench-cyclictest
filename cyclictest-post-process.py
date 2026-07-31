@@ -48,7 +48,7 @@ def main():
             if match.startswith("# Max Latencies:"):
                 latencies = match.split(":", 1)[1].split()
                 system_max_latency = int(latencies[-1])
-                desc = {"source": "cyclictest", "type": primary_metric, "class": "count"}
+                desc = {"source": "cyclictest", "type": primary_metric, "class": "latency", "default-aggregation": "max"}
                 sample = {"begin": times["begin"], "end": times["end"], "value": system_max_latency}
                 metrics.log_sample("0", desc, {}, sample)
 
