@@ -23,7 +23,7 @@
       "args": [
         "policy"
       ],
-      "vals": "fifo|rr|other|idle|batch"
+      "vals": "^(fifo|rr|other|idle|batch)$"
     },
     "onoff": {
       "description": "on|off",
@@ -31,7 +31,7 @@
         "smt",
         "smi"
       ],
-      "vals": "on|off"
+      "vals": "^(on|off)$"
     },
     "integer_ge_zero": {
       "description": "a whole number >= 0",
