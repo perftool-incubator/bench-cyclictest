@@ -8,6 +8,8 @@ Scripts and configuration to run the [cyclictest](https://wiki.linuxfoundation.o
 | File | Purpose |
 |------|---------|
 | `rickshaw.json` | Rickshaw integration: defines client/server scripts, parameter transformations |
+| `multiplex.json` | Parameter validation rules, unit conversions, and presets for multiplex |
+| `benchmark-metadata.json` | Machine-readable description and CDM-indexed source/type list (consumed by `crucible benchmarks list`) |
 | `cyclictest-base` | Base setup shared by client and server |
 | `cyclictest-client` | Client execution script |
 | `cyclictest-server-start` / `cyclictest-server-stop` | Server lifecycle scripts |

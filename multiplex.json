@@ -1,0 +1,44 @@
+{
+  "presets": {
+  },
+  "validations": {
+    "integer_gt_zero": {
+      "description": "a whole number > 0",
+      "args": [
+        "duration",
+        "interval",
+        "stress-ng-tiles-per-cpu"
+      ],
+      "vals": "^[1-9][0-9]*$"
+    },
+    "priority": {
+      "description": "priority level of the cyclictest process (1-99)",
+      "args": [
+        "priority"
+      ],
+      "vals": "^[1-9]$|^[1-9][0-9]$"
+    },
+    "policy": {
+      "description": "scheduling policy",
+      "args": [
+        "policy"
+      ],
+      "vals": "^(fifo|rr|other|idle|batch)$"
+    },
+    "onoff": {
+      "description": "on|off",
+      "args": [
+        "smt",
+        "smi"
+      ],
+      "vals": "^(on|off)$"
+    },
+    "integer_ge_zero": {
+      "description": "a whole number >= 0",
+      "args": [
+        "break-on"
+      ],
+      "vals": "^[0-9]+$"
+    }
+  }
+}
